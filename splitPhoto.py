@@ -1,10 +1,9 @@
-from datetime import datetime
+import os
 import shutil
 import uuid
-import cv2
-import os
+from datetime import datetime
 
-import numpy as np
+import cv2
 
 
 def find_subphotos_and_save(
@@ -26,13 +25,11 @@ def find_subphotos_and_save(
 
     # 1. Read the image
     image = cv2.imread(input_image_path)
-
-    image_width = image.shape[1]
-    image_height = image.shape[0]
-
     if image is None:
         print(f"Could not read image at {input_image_path}. Skipping.")
         return
+
+    image_height, image_width = image.shape[:2]
 
     # 2. Convert to grayscale
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -54,9 +51,9 @@ def find_subphotos_and_save(
     # 5. Loop through contours, filter, deskew, and save each sub-photo
 
     for contour in contours:
-        area = cv2.contourArea(contour)   
+        area = cv2.contourArea(contour)
 
-        
+
 
         if area < min_contour_area:
             # Ignore noise or very small contours
@@ -84,14 +81,14 @@ def find_subphotos_and_save(
         rotated = cv2.warpAffine(image, M, (image_width, image_height))
 
         # 5c. After rotation, extract the bounding box of the sub-photo
-        #     Because we've rotated, we can now treat it like an upright 
+        #     Because we've rotated, we can now treat it like an upright
         # boundingRect
         w, h = int(w), int(h)
         x = int(cx - w / 2)
         y = int(cy - h / 2)
-        
+
         cropped = rotated[y : y + h, x : x + w]
-        
+
         subphoto_id = f"{date_now}_{uuid.uuid4()}"
 
         # 5d. Save each sub-photo
@@ -108,9 +105,7 @@ def find_subphotos_and_save(
 
 
 def check_and_create_folder(folder: str):
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-        print(f"Folder '{folder}' created.")
+    os.makedirs(folder, exist_ok=True)
 
 
 if __name__ == "__main__":

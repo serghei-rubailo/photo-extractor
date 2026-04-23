@@ -16,10 +16,16 @@ Reads `.jpg` files from `./scan/`, writes extracted sub-photos to `./output/`, m
 
 ## Dependencies
 
-- opencv-python (cv2)
-- numpy
+Install: `pip install -r requirements-dev.txt`
 
-No requirements.txt exists. Install manually: `pip install opencv-python numpy`
+Runtime: opencv-python, numpy. Dev: pytest, ruff.
+
+## Lint and Test
+
+```bash
+ruff check .
+pytest tests/ -v
+```
 
 ## Architecture
 
