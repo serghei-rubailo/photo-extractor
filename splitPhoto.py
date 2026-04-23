@@ -64,10 +64,13 @@ def find_subphotos_and_save(
         )
 
         w, h = int(w), int(h)
-        x = max(0, int(cx - w / 2))
-        y = max(0, int(cy - h / 2))
-        x_end = min(image_width, x + w)
-        y_end = min(image_height, y + h)
+        # Trim 1% margin to discard contour boundary noise
+        margin_x = max(1, int(w * 0.01))
+        margin_y = max(1, int(h * 0.01))
+        x = max(0, int(cx - w / 2) + margin_x)
+        y = max(0, int(cy - h / 2) + margin_y)
+        x_end = min(image_width, int(cx + w / 2) - margin_x)
+        y_end = min(image_height, int(cy + h / 2) - margin_y)
 
         cropped = rotated[y:y_end, x:x_end]
 
