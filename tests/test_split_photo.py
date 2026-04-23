@@ -20,7 +20,6 @@ def _setup_dirs(tmp_path):
 
 
 def _white_image(height, width):
-    """Create a white (255) BGR image."""
     return np.ones((height, width, 3), dtype=np.uint8) * 255
 
 

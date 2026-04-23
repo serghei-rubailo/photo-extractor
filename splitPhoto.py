@@ -39,6 +39,7 @@ def find_subphotos_and_save(
     contours, _ = cv2.findContours(
         thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
     )
+    del gray, thresh
 
     file_name = os.path.splitext(os.path.basename(input_image_path))[0]
     date_now = datetime.now().strftime("%Y-%m-%d-%H_%M_%S")
@@ -107,13 +108,12 @@ if __name__ == "__main__":
     check_and_create_folder(output_folder)
     check_and_create_folder(processed_folder)
 
-    extensions = (
-        "*.jpg", "*.jpeg", "*.JPG", "*.JPEG",
-        "*.png", "*.PNG", "*.tiff", "*.tif", "*.bmp",
-    )
+    extensions = ("*.jpg", "*.jpeg", "*.png", "*.tiff", "*.tif", "*.bmp")
     image_files = []
     for ext in extensions:
         image_files.extend(glob.glob(os.path.join(input_folder, ext)))
+    # Deduplicate on case-insensitive filesystems (macOS HFS+/APFS)
+    image_files = sorted(set(image_files))
 
     for img_path in image_files:
         find_subphotos_and_save(
