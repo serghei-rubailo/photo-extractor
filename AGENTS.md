@@ -12,7 +12,7 @@ Photo extractor tool for the Krugosvet project. Detects and extracts individual 
 python splitPhoto.py
 ```
 
-Reads `.jpg` files from `./scan/`, writes extracted sub-photos to `./output/`, moves processed originals to `./processed/`. All three directories are auto-created on startup.
+Reads image files from `./scan/`, writes extracted sub-photos to `./output/`, moves processed originals to `./processed/`. All three directories are auto-created on startup.
 
 ## Dependencies
 
@@ -31,8 +31,8 @@ pytest tests/ -v
 
 Single-file tool (`splitPhoto.py`):
 
-- `find_subphotos_and_save()` — core pipeline: read image → grayscale → threshold → find contours → filter by area → deskew via minAreaRect → crop → save. Moves the original to `processed/` after extraction.
+- `find_subphotos_and_save()` — core pipeline: read image, grayscale, threshold, find contours, filter by area, deskew via minAreaRect, crop, save. Returns count of saved sub-photos. Moves original to `processed/` only if sub-photos were found.
 - `check_and_create_folder()` — ensures a directory exists.
-- `__main__` block — iterates over `./scan/*.jpg` with a hardcoded `min_contour_area=500_000`.
+- `__main__` block — iterates over `./scan/*` (jpg, jpeg, png, tiff, bmp) with a hardcoded `min_contour_area=500_000`.
 
-Key OpenCV flow: binary threshold at 200 → `RETR_EXTERNAL` contours → `minAreaRect` for rotation angle → `warpAffine` to deskew → crop bounding box.
+Key OpenCV flow: binary threshold at 200, `RETR_EXTERNAL` contours, `minAreaRect` for rotation angle, `warpAffine` to deskew (white border fill), crop with bounds clamping.
