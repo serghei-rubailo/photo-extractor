@@ -57,22 +57,17 @@ def find_subphotos_and_save(
         rect = cv2.minAreaRect(contour)
         (cx, cy), (w, h), angle = rect
 
+        if angle > 45:
+            w, h = h, w
+            angle = angle - 90
+
         M = cv2.getRotationMatrix2D((cx, cy), angle, 1.0)
-        rotated = cv2.warpAffine(
-            image, M, (image_width, image_height),
-            borderMode=cv2.BORDER_CONSTANT, borderValue=(255, 255, 255),
-        )
+        rotated = cv2.warpAffine(image, M, (image_width, image_height))
 
         w, h = int(w), int(h)
-        # Trim 1% margin to discard contour boundary noise
-        margin_x = max(1, int(w * 0.01))
-        margin_y = max(1, int(h * 0.01))
-        x = max(0, int(cx - w / 2) + margin_x)
-        y = max(0, int(cy - h / 2) + margin_y)
-        x_end = min(image_width, int(cx + w / 2) - margin_x)
-        y_end = min(image_height, int(cy + h / 2) - margin_y)
-
-        cropped = rotated[y:y_end, x:x_end]
+        x = int(cx - w / 2)
+        y = int(cy - h / 2)
+        cropped = rotated[y : y + h, x : x + w]
 
         if cropped.size == 0:
             print("Warning: empty crop for contour, skipping.")

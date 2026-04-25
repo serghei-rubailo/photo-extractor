@@ -180,28 +180,3 @@ class TestEdgeCases:
         # Should not raise even with coordinates near zero
         result = find_subphotos_and_save(img_path, output_dir, processed_dir, 1000)
         assert result >= 0  # no crash is the main assertion
-
-    def test_crop_margin_trims_boundary_noise(self, tmp_path):
-        """Extracted sub-photos should not include boundary artifacts from JPEG compression."""
-        input_dir, output_dir, processed_dir = _setup_dirs(tmp_path)
-        img = _white_image(2000, 2000)
-        # Dark rectangle with known color on white background
-        fill_color = (40, 40, 40)
-        cv2.rectangle(img, (200, 200), (1200, 1000), fill_color, -1)
-        img_path = os.path.join(input_dir, "margin.jpg")
-        cv2.imwrite(img_path, img)
-
-        find_subphotos_and_save(img_path, output_dir, processed_dir, 500_000)
-        output_files = os.listdir(output_dir)
-        assert len(output_files) == 1
-
-        sub = cv2.imread(os.path.join(output_dir, output_files[0]))
-        # Check border pixels are NOT white (i.e. margin trimmed the boundary)
-        top_row_mean = sub[0, :].mean()
-        left_col_mean = sub[:, 0].mean()
-        assert top_row_mean < 150, (
-            f"Top row too bright ({top_row_mean:.0f}), margin trim not working"
-        )
-        assert left_col_mean < 150, (
-            f"Left col too bright ({left_col_mean:.0f}), margin trim not working"
-        )
